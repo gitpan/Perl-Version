@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Scalar::Util qw( blessed isvstring );
 
-use version; our $VERSION = qv( '0.0.1' );
+use version; our $VERSION = qv( '0.0.3' );
 
 use overload (
     '""'  => \&stringify,
@@ -134,7 +134,7 @@ sub _parse {
         my $threes = pop @parts;
 
         if ( length( $threes ) % 3 ) {
-            warn "Decimal part not a multiple of three digits: $ver";
+            carp "Decimal part not a multiple of three digits: $ver";
             $threes .= '0' while length( $threes ) % 3;
         }
 
@@ -186,7 +186,7 @@ sub _parse {
     push @ver, map { $_ + 0 } @parts;
 
     if ( grep { $_ > 999 } @ver ) {
-        warn "Version has component > 999: $version";
+        carp "Version has component > 999: $version";
     }
 
     $self->{version} = \@ver;
@@ -364,7 +364,7 @@ Perl::Version - Parse and manipulate Perl version strings
 
 =head1 VERSION
 
-This document describes Perl::Version version 0.0.1
+This document describes Perl::Version version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -528,9 +528,9 @@ prints
 =item vstring
 
 Perls later than 5.8.1 support vstring format. A vstring looks like a
-number a number with more than one decimal point and (optionally) a
-leading 'v'. The 'v' is mandatory for vstring's containing fewer than
-two decimal points.
+number with more than one decimal point and (optionally) a leading
+'v'. The 'v' is mandatory for vstrings containing fewer than two
+decimal points.
 
 Perl::Version will successfully parse vstrings
 
@@ -671,13 +671,6 @@ the value of the version formatting information is captured so that the
 version can be modified and the updated value retrieved in the same
 format as the original.
 
-    #!/usr/bin/perl
-
-    use strict;
-    use warnings;
-    use lib qw(lib);
-    use Perl::Version;
-
     my @version = (
         '1.3.0',    'v1.03.00',     '1.10.03', '2.00.00',
         '1.2',      'v1.2.3.4.5.6', 'v1.2',    'Revision: 3.0',
@@ -686,22 +679,25 @@ format as the original.
 
     for my $v ( @version ) {
         my $version = Perl::Version->new( $v );
+        $version->inc_version;
         print "$version\n";
     }
 
 prints
 
-    1.3.0
-    v1.03.00
-    1.10.03
-    2.00.00
-    1.2
-    v1.2.3.4.5.6
-    v1.2
-    Revision: 3.0
-    1.001001
-    1.001_001
-    3.0.4_001
+    1.4.0
+    v1.04.00
+    1.11.00
+    2.01.00
+    1.3
+    v1.3.0.0.0.0
+    v1.3
+    Revision: 3.1
+    1.002000
+    1.002
+    3.1.0
+
+In each case the incremented version is formatted in the same way as the original.
 
 If no arguments are passed an empty version intialised to 'v0' will be
 constructed.
@@ -932,7 +928,7 @@ of the original version string.
 
 An unanchored regular expression that matches any of the version formats
 supported by Perl::Version. Three captures get the prefix part, the main
-body of the version and any alpha suffix.
+body of the version and any alpha suffix respectively.
 
     my $version = 'v1.2.3.4_5';
     my ($prefix, $main, $suffix) = ($version =~ Perl::Version::REGEX);
@@ -949,7 +945,7 @@ prints
 An anchored regular expression that matches a correctly formatted
 version string. Five captures get any leading whitespace, the prefix
 part, the main body of the version, any alpha suffix and any
-trailing spaces.
+trailing spaces respectively.
 
     my $version = '  v1.2.3.4_5  ';
     my ($before, $prefix, $main, $suffix, $after) 
@@ -997,7 +993,7 @@ You've attempted to access a component by name using a name that isn't
 recognised. Valid component names are 'revision', 'version', 'subversion'
 and 'alpha'. Case is not significant.
 
-=item C<< Can't compare with $other >>
+=item C<< Can't compare with %s >>
 
 You've tried to compare a Perl::Version with something other than a
 version string, a number or another Perl::Version.

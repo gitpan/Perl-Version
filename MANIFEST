@@ -1,8 +1,9 @@
 Changes
-MANIFEST
-Makefile.PL
-README
 lib/Perl/Version.pm
+Makefile.PL
+MANIFEST
+Notes.txt
+README
 t/00.load.t
 t/05.misc.t
 t/10.regression.t
