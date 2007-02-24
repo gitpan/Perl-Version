@@ -5,8 +5,7 @@ use ExtUtils::MakeMaker;
 eval 'use ExtUtils::MakeMaker::Coverage';
 warn "Optional ExtUtils::MakeMaker::Coverage not available\n" if $@;
 
-WriteMakefile(
-    ( MM->can( 'signature_target' ) ? ( SIGN => 1 ) : () ),
+my %ARGS = (
     NAME          => 'Perl::Version',
     AUTHOR        => 'Andy Armstrong <andy@hexten.net>',
     VERSION_FROM  => 'lib/Perl/Version.pm',
@@ -21,3 +20,7 @@ WriteMakefile(
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Perl-Version-*' },
 );
+
+$ARGS{SIGN} = 1 if MM->can( 'signature_target' );
+
+WriteMakefile( %ARGS );
