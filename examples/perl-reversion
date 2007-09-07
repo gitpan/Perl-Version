@@ -56,6 +56,13 @@ my @MAGIC = (
         },
     },
     {
+        name => 'meta',
+        test => sub {
+            my ( $name, $info ) = @_;
+            return $name eq 'META.yml';
+        },
+    },
+    {
         name => 'plain',
         test => sub {
             my ( $name, $info ) = @_;
@@ -161,6 +168,11 @@ sub version_re_plain {
     return qr{ ^ ( .*? ) $ver_re ( .* ) $ }x;
 }
 
+sub version_re_meta {
+    my $ver_re = shift;
+    return qr{ ^ ( \s* version: \s* ) $ver_re ( \s* ) $ }x;
+}
+
 sub set_versions {
     my $docs        = shift;
     my $versions    = shift;
@@ -248,6 +260,16 @@ sub find_versions {
                 }
             ],
             done => [],
+        },
+
+        # State machine for META.yml.
+        meta => {
+            init => [
+                {
+                    re   => version_re_meta( $ver_re ),
+                    mark => 1,
+                }
+            ],
         },
     );
 

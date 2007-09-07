@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Perl-Version
-version:             v1.001
+version:             v1.002
 abstract:            Parse and manipulate Perl version strings
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36
