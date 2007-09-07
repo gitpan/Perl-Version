@@ -30,8 +30,9 @@ my $MODULE_RE = qr{ [.] pm $ }x;
 # Places to look for files / directories when processing a project
 
 my %CONSIDER = (
-    'lib/'   => { like => $MODULE_RE },
-    'README' => {},
+    'lib/'     => { like => $MODULE_RE },
+    'README'   => {},
+    'META.yml' => {},
 );
 
 # Maximum number of levels above current directory to search for
