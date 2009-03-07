@@ -68,3 +68,9 @@ Revision history for Perl-Version
         * try to only find top-level keys in META.yml; this means we will stop
           catching the version from meta-spec and (hopefully) only catch the
           dist's version.
+
+1.008   2009-03-07
+        Skip perl-reversion tests on Windows. They need fork.
+        Allow negative indexes on component, increment. See #42181.
+        perl-reversion now checks in bin, script subdirectories. See #28119.
+
