@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Perl-Version
-version:            1.010
+version:            1.011
 abstract:           Parse and manipulate Perl version strings
 author:
     - Andy Armstrong <andy@hexten.net>
