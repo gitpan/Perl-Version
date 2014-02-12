@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '1.011';
+our $VERSION = '1.013';
 
 use overload (
   '""'  => \&stringify,
@@ -371,7 +371,7 @@ Perl::Version - Parse and manipulate Perl version strings
 
 =head1 VERSION
 
-This document describes Perl::Version version 1.011
+This document describes Perl::Version version 1.013
 
 =head1 SYNOPSIS
 
@@ -520,7 +520,7 @@ Versions with a leading 'v'.
 
 Fielded numeric versions. You'll likely have seen this in relation to
 versions of Perl itself. If a version string has a single decimal point
-and the part after the point is three more more digits long components
+and the part after the point is three more more digits long, components
 are extracted from each group of three digits in the fractional part.
 
 For example
@@ -919,7 +919,7 @@ prints
 =item C<< <=> >> and C<< cmp >>
 
 The C<< <=> >> and C<< cmp >> operators are overloaded (by the L<vcmp>
-method) so that comparisions between versions work as expected. This
+method) so that comparisons between versions work as expected. This
 means that the other numeric and string comparison operators also work
 as expected.
 

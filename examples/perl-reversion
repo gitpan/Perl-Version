@@ -8,10 +8,11 @@
 use strict;
 use warnings;
 use Perl::Version;
+use Carp qw(croak);
 use Getopt::Long;
 use Pod::Usage;
 use File::Spec;
-use File::Slurp;
+use File::Slurp::Tiny qw(read_lines);
 use File::Basename;
 
 # Files that suggest that we have a project directory. The scores next
@@ -21,10 +22,12 @@ use File::Basename;
 my %PROJECT_SIGNATURE = (
   'Makefile.PL' => 0.4,
   'Build.PL'    => 0.4,
+  'dist.ini'    => 0.4,
   'MANIFEST'    => 0.4,
   't/'          => 0.4,
   'lib/'        => 0.4,
   'Changes'     => 0.4,
+  'xt/'         => 0.4,
 );
 
 my $MODULE_RE = qr{ [.] pm $ }x;
@@ -212,25 +215,25 @@ sub version_re_perl {
   my $ver_re = shift;
 
   return
-   qr{ ^ ( .*?  [\$\*] (?: \w+ (?: :: | ' ) )* VERSION \s* = \D* ) 
+   qr{ ^ ( .*?  [\$\*] (?: \w+ (?: :: | ' ) )* VERSION \s* = \D*? )
                  $ver_re 
-                 ( .* ) $ }x;
+                 ( .* \s*) \z }x;
 }
 
 sub version_re_pod {
   my $ver_re = shift;
 
-  return qr{ ^ ( .*? (?i: version ) .*? ) $ver_re ( .* ) $ }x;
+  return qr{ ^ ( .*? (?i: version ) .*? ) $ver_re ( .* \s*) \z }x;
 }
 
 sub version_re_plain {
   my $ver_re = shift;
-  return qr{ ^ ( .*? ) $ver_re ( .* ) $ }x;
+  return qr{ ^ ( .*? ) $ver_re ( .* \s* ) \z }x;
 }
 
 sub version_re_meta {
   my ( $indent, $ver_re ) = @_;
-  return qr{ ^ ( $indent version: \s* ) $ver_re ( \s* ) $ }x;
+  return qr{ ^ ( $indent version: \s* ) $ver_re ( \s* ) }x;
 }
 
 sub set_versions {
@@ -259,7 +262,7 @@ sub set_versions {
       }
 
       $info->{lines}[ $edit->{line} ]
-       = $edit->{pre} . $edit->{ver} . $edit->{post} . "\n";
+       = $edit->{pre} . $edit->{ver} . $edit->{post};
       $info->{dirty}++;
     }
   }
@@ -441,9 +444,9 @@ sub load_all {
 
   for my $doc ( keys %$docs ) {
 
-    #note( "Loading $doc\n" );
+    #note( "Loading $doc\n" );    
     $docs->{$doc} = {
-      lines => read_file( $doc, array_ref => 1 ),
+      lines => read_lines( $doc, binmode => ':raw', array_ref => 1 ),
       dirty => 0,
     };
     $docs->{$doc}{type} = guess_type( $doc, $docs->{$doc} );
@@ -461,7 +464,10 @@ sub save_all {
     }
     else {
       note( "Saving $doc\n" );
-      write_file( $doc, { atomic => 1 }, $docs->{$doc}{lines} );
+      open my $fh, '>:raw', $doc or croak "Could not open file $doc: $!\n";
+      $fh->autoflush(1);
+      print $fh @{ $docs->{$doc}{lines} };
+      close $fh;
     }
   }
 }
